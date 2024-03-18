@@ -113,7 +113,7 @@ async function addFavorite(req, res){
         user.favorites.push(song._id); 
         await user.save();
 
-        res.status(200).json({ message: 'Song added to favorites successfully', user });
+        res.status(200).json({ message: 'Song added to favorites successfully', song });
     } catch (error) {
         res.status(500).json({error: error.message});
     }
@@ -214,15 +214,15 @@ async function removeSongFromFavorites(req, res){
         if (!user) {
             return res.status(500).json({ message: 'User not found' });
         }
-
-        if (!user.favorites.includes(songId)) {
+        const song = await Song.findOne({songId})
+        let foundFavorite = user.favorites.includes(song._id)
+        if (!foundFavorite) {
             return res.status(500).json({ message: 'Song is not in favorites' });
         }
 
-        user.favorites.pull(songId);
-        await user.save();
+        const result = await User.updateOne({_id: userId}, {$pull: {favorites: song._id}})
 
-        res.status(200).json({ message: 'Song removed from favorites successfully', user });
+        res.status(200).json({ message: 'Song removed from favorites successfully', user, song });
     } catch (error) {
         res.status(500).json({error: error.message });
     }
