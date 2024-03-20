@@ -4,7 +4,7 @@ const {body} = require('express-validator')
 
 
 
-const {signup, login, addPlaylist, addFavorite, getUserInfo, removeSongFromFavorites, addSongToPlaylist} = require('../user/controller/userController')
+const {signup, login, addPlaylist, addFavorite, getUserInfo, removeSongFromFavorites, addSongToPlaylist, removeSongFromPlaylist, removePlaylist} = require('../user/controller/userController')
 
 router.post('/signup', [
     body('username', 'username cannot be empty').not().isEmpty(),
@@ -23,8 +23,12 @@ router.post('/add-favorite/:userId', addFavorite)
 
 router.get('/get-user-info/:userId', getUserInfo)
 
-router.delete('/delete-favorite/:userId/:songId', removeSongFromFavorites)
+router.post('/delete-favorite/:userId/:id', removeSongFromFavorites)
 
 router.post('/add-song-playlist/:playlistId/:songId', addSongToPlaylist)
+
+router.post('/remove-playlist-song/:playlistId/:id', removeSongFromPlaylist)
+
+router.post('/remove-playlist/:userId/:playlistId', removePlaylist)
 
 module.exports = router

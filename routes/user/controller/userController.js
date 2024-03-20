@@ -158,7 +158,7 @@ async function addSongToPlaylist(req, res){
             return res.status(500).json({ message: 'Playlist not found' });
         }
 
-        let song = await Song.findOne({songId: songId});
+        let song = await Song.findOne({songId});
         if (!song) {
             song = new Song({
                 songId,
@@ -177,7 +177,7 @@ async function addSongToPlaylist(req, res){
         playlist.songs.push(song._id);
         await playlist.save();
 
-        res.status(200).json({ message: 'Song added to playlist successfully' , playlist});
+        res.status(200).json({ message: 'Song added to playlist successfully' , playlist, song});
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
@@ -185,17 +185,17 @@ async function addSongToPlaylist(req, res){
 
 async function removeSongFromPlaylist(req, res){
     const playlistId = req.params.playlistId;
-    const songId = req.params.songId;
+    const id = req.params.id;
 
     try {
-        // Find the playlist by its ID
+        
         const playlist = await Playlist.findById(playlistId);
         if (!playlist) {
             return res.status(404).json({ message: 'Playlist not found' });
         }
 
-        // Remove the song from the playlist's songs array
-        playlist.songs.pull(songId);
+        
+        playlist.songs.pull({_id: id});
         await playlist.save();
 
         res.status(200).json({ message: 'Song removed from playlist successfully' });
@@ -206,7 +206,7 @@ async function removeSongFromPlaylist(req, res){
 
 async function removeSongFromFavorites(req, res){
     const userId = req.params.userId;
-    const songId = req.params.songId;
+    const id = req.params.id;
 
     try {
         
@@ -214,19 +214,29 @@ async function removeSongFromFavorites(req, res){
         if (!user) {
             return res.status(500).json({ message: 'User not found' });
         }
-        const song = await Song.findOne({songId})
+        const song = await Song.findOne({_id: id})
         let foundFavorite = user.favorites.includes(song._id)
         if (!foundFavorite) {
             return res.status(500).json({ message: 'Song is not in favorites' });
         }
 
-        const result = await User.updateOne({_id: userId}, {$pull: {favorites: song._id}})
+        const result = await User.updateOne({_id: userId}, {$pull: {favorites: id}})
 
-        res.status(200).json({ message: 'Song removed from favorites successfully', user, song });
+        res.status(200).json({ message: 'Song removed from favorites successfully', result, song });
     } catch (error) {
         res.status(500).json({error: error.message });
     }
 }
 
+async function removePlaylist(req, res){
+    try {
+        const {userId, playlistId} = req.params
+        const updatedUser = await User.findOneAndUpdate({_id: userId}, {$pull: {playlists: playlistId}})
+        res.status(200).json(updatedUser)
+    } catch (error) {
+        res.status(500).json({error: error.message})
+    }
+}
 
-module.exports = {signup, login, addPlaylist, addFavorite, getUserInfo, removeSongFromFavorites, addSongToPlaylist}
+
+module.exports = {signup, login, addPlaylist, addFavorite, getUserInfo, removeSongFromFavorites, addSongToPlaylist, removeSongFromPlaylist, removePlaylist}
