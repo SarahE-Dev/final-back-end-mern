@@ -238,5 +238,17 @@ async function removePlaylist(req, res){
     }
 }
 
+async function updateUserInfo(req, res){
+    try {
+        const {username, email} = req.body
+        const {id} = req.params
+        const updatedUser = await User.findByIdAndUpdate({_id: id}, {username, email}, {new: true})
+        const jwt_token = jwt.sign({ id: updatedUser._id, username: updatedUser.username, email: updatedUser.email }, process.env.JWT_KEY, { expiresIn: '24h' });
+        res.cookie('music-app-cookie', jwt_token)
+        res.status(200).json(updatedUser)
+    }catch(error){
+        res.status(500).json({error: error.message})
+    }
+}
 
-module.exports = {signup, login, addPlaylist, addFavorite, getUserInfo, removeSongFromFavorites, addSongToPlaylist, removeSongFromPlaylist, removePlaylist}
+module.exports = {signup, login, addPlaylist, addFavorite, getUserInfo, removeSongFromFavorites, addSongToPlaylist, removeSongFromPlaylist, removePlaylist, updateUserInfo}
