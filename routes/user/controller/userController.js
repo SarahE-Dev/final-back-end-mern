@@ -214,13 +214,13 @@ async function removeSongFromFavorites(req, res){
         if (!user) {
             return res.status(500).json({ message: 'User not found' });
         }
-        const song = await Song.findOne({_id: id})
+        const song = await Song.findOne({songId: id})
         let foundFavorite = user.favorites.includes(song._id)
         if (!foundFavorite) {
             return res.status(500).json({ message: 'Song is not in favorites' });
         }
 
-        const result = await User.updateOne({_id: userId}, {$pull: {favorites: id}})
+        const result = await User.updateOne({_id: userId}, {$pull: {favorites: song._id}})
 
         res.status(200).json({ message: 'Song removed from favorites successfully', result, song });
     } catch (error) {
