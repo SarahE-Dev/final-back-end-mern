@@ -6,6 +6,7 @@ const logger = require('morgan');
 
 require('dotenv').config()
 let originURL = process.env.NODE_ENV === 'development' ? 'http://localhost:5173' : "DEPLOYMENT ADDRESS"
+let databaseURL = process.env.MONGO_URI
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.use(logger('dev'));
 
 app.use('/api/user', userRouter)
 
-mongoose.connect('mongodb://127.0.0.1:27017/music_app_database')
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Error connecting to MongoDB', err));
 
