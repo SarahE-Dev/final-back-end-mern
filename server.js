@@ -4,8 +4,7 @@ const cors = require('cors');
 const userRouter = require('./routes/user/userRouter')
 const logger = require('morgan');
 
-require('dotenv').config()
-let originURL = process.env.NODE_ENV === 'development' ? 'http://localhost:5173' : "DEPLOYMENT ADDRESS"
+let originURL = process.env.NODE_ENV === 'development' ? 'http://localhost:5173' : "https://fyretunes.saraheatherly.dev"
 let databaseURL = process.env.MONGO_URI
 
 const app = express();
@@ -16,11 +15,11 @@ app.use(logger('dev'));
 
 app.use('/api/user', userRouter)
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(databaseURL)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Error connecting to MongoDB', err));
 
-const port = process.env.PORT || 3002;
+const port = 3002;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 }); 
